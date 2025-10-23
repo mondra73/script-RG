@@ -13,7 +13,7 @@ const start = async () => {
     // Servidor mínimo para Render
     const server = http.createServer((req, res) => {
       res.writeHead(200, { 'Content-Type': 'text/plain' });
-      res.end('✅ RG Watcher Bot is running\n');
+      res.end('El watcher esta corriendo bebe, cuando publiquen un auto nuevo te lo mando por telegram yiyi');
     });
     
     const PORT = process.env.PORT || 3000;
