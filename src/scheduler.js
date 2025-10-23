@@ -16,11 +16,14 @@ const checkOnce = async () => {
     console.log(`📝 Se encontraron ${autos.length} autos filtrados en la página.`);
 
     const nuevos = [];
-    const primeros = await Publication.countDocuments(); // revisa si la DB está vacía
+    const esPrimeraEjecucion = (await Publication.countDocuments()) === 0;
 
     for (const a of autos) {
       const existe = await Publication.findOne({ link: a.link }).lean();
-      if (!existe || primeros === 0) { // primera ejecución manda todo
+      
+      // Solo agregar si NO existe en la BD
+      // O si es la primera ejecución (BD vacía)
+      if (!existe) {
         const doc = await Publication.create({
           link: a.link,
           title: a.title,
@@ -34,16 +37,26 @@ const checkOnce = async () => {
     }
 
     console.log(`✨ Nuevos autos detectados: ${nuevos.length}`);
+    
+    // Si es la primera ejecución y hay autos, notificar todos
+    // Si no es la primera, solo notificar los nuevos
     if (nuevos.length > 0) {
+      if (esPrimeraEjecucion) {
+        console.log('🆕 Primera ejecución - Notificando todos los autos encontrados');
+      } else {
+        console.log('🆕 Notificando autos nuevos');
+      }
       await notifyNewAutos(nuevos);
+    } else {
+      console.log('ℹ️ No hay autos nuevos para notificar');
     }
 
     console.log('✅ Verificación finalizada');
   } catch (err) {
     console.error('❌ Error en checkOnce:', err.message);
+    logger.error('Error en checkOnce:', err.message);
   }
 };
-
 
 const startScheduler = () => {
   logger.info('Scheduler iniciado con cron: cada 30 minutos');
@@ -59,7 +72,6 @@ const startScheduler = () => {
     timezone: 'America/Argentina/Buenos_Aires'
   });
 };
-
 
 module.exports = { startScheduler, checkOnce };
 

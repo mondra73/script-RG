@@ -8,10 +8,9 @@ const YEAR_FROM = 2018;
 const KM_TO = 60000;
 const COMBUSTIBLE = 'nafta';
 const TRANSMISION = 'MT';
-const RBR_ID = 107;   // podes ajustar según necesidad
-const MRK_ID = 1118;  // podes ajustar según necesidad
+const RBR_ID = 107;  
+const MRK_ID = 1118;  
 
-// Construimos la URL completa usando URLSearchParams
 const searchParams = new URLSearchParams({
   action: 'finder/search',
   rbrId: RBR_ID,

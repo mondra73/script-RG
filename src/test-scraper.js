@@ -3,6 +3,7 @@ const { ROSARIO_URL, USER_AGENT } = require('./config');
 const { parseAutos } = require('./parser');
 const { notifyNewAutos } = require('./notifier');
 const axios = require('axios');
+const fs = require('fs');
 
 (async () => {
   try {
@@ -15,6 +16,20 @@ const axios = require('axios');
 
     console.log('✅ HTML obtenido correctamente');
     console.log('📄 Longitud del HTML:', res.data.length);
+
+    // GUARDAR HTML PARA ANALIZAR
+    fs.writeFileSync('debug-html.html', res.data);
+    console.log('💾 HTML guardado en debug-html.html');
+
+    // CONTAR ELEMENTOS CON CLASE "item"
+    const cheerio = require('cheerio');
+    const $ = cheerio.load(res.data);
+    const itemCount = $('div.item').length;
+    console.log(`🔍 Elementos con clase "item": ${itemCount}`);
+
+    // MOSTRAR PRIMEROS 500 CARACTERES DEL HTML PARA VER ESTRUCTURA
+    console.log('📋 Primeros 500 caracteres del HTML:');
+    console.log(res.data.substring(0, 500));
 
     const autos = parseAutos(res.data);
     console.log(`📝 Autos encontrados por el parser: ${autos.length}`);
