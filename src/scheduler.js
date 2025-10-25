@@ -20,9 +20,6 @@ const checkOnce = async () => {
 
     for (const a of autos) {
       const existe = await Publication.findOne({ link: a.link }).lean();
-      
-      // Solo agregar si NO existe en la BD
-      // O si es la primera ejecución (BD vacía)
       if (!existe) {
         const doc = await Publication.create({
           link: a.link,
@@ -38,8 +35,6 @@ const checkOnce = async () => {
 
     console.log(`✨ Nuevos autos detectados: ${nuevos.length}`);
     
-    // Si es la primera ejecución y hay autos, notificar todos
-    // Si no es la primera, solo notificar los nuevos
     if (nuevos.length > 0) {
       if (esPrimeraEjecucion) {
         console.log('🆕 Primera ejecución - Notificando todos los autos encontrados');
@@ -52,29 +47,24 @@ const checkOnce = async () => {
     }
 
     console.log('✅ Verificación finalizada');
+    return { ok: true, nuevos: nuevos.length };
   } catch (err) {
     console.error('❌ Error en checkOnce:', err.message);
     logger.error('Error en checkOnce:', err.message);
+    return { ok: false, error: err.message };
   }
 };
 
-const startScheduler = () => {
-  logger.info('Scheduler iniciado con cron: cada 30 minutos');
+// ⚠️ El cron interno lo desactivo para usar el externo cron.job.org
+// const startScheduler = () => {
+//   logger.info('Scheduler iniciado con cron: cada 30 minutos');
+//   checkOnce();
+//   cron.schedule('0,30 * * * *', async () => {
+//     await checkOnce();
+//   }, {
+//     scheduled: true,
+//     timezone: 'America/Argentina/Buenos_Aires'
+//   });
+// };
 
-  // Ejecuta inmediatamente al arrancar
-  checkOnce();
-
-  // Ejecuta cada 30 minutos (0 y 30)
-  cron.schedule('0,30 * * * *', async () => {
-    await checkOnce();
-  }, {
-    scheduled: true,
-    timezone: 'America/Argentina/Buenos_Aires'
-  });
-};
-
-module.exports = { startScheduler, checkOnce };
-
-if (require.main === module) {
-  startScheduler();
-}
+module.exports = { checkOnce };
