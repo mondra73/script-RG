@@ -1,5 +1,5 @@
 const connectDB = require('./db');
-const { checkOnce } = require('./scheduler'); // cambiamos startScheduler por checkOnce
+const { checkOnce } = require('./scheduler'); // mantenemos tu función original
 const logger = require('./logger');
 const http = require('http');
 const url = require('url');
@@ -18,12 +18,31 @@ const start = async () => {
         return;
       }
 
-      // Nueva ruta /check -> ejecuta checkOnce()
+      // Ruta /check -> ejecuta checkOnce()
       if (parsedUrl.pathname === '/check') {
         console.log('🕒 Ping recibido desde cron-job.org, ejecutando checkOnce()...');
-        const result = await checkOnce();
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify(result));
+        try {
+          const result = await checkOnce(); // 🔹 Tu lógica sigue idéntica
+          // Respondemos corto, sin devolver todo el HTML parseado
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              ok: true,
+              timestamp: new Date().toISOString(),
+              message: 'checkOnce ejecutado correctamente ✅',
+            })
+          );
+        } catch (error) {
+          console.error('❌ Error en checkOnce:', error);
+          res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(
+            JSON.stringify({
+              ok: false,
+              error: error.message,
+              timestamp: new Date().toISOString(),
+            })
+          );
+        }
         return;
       }
 
@@ -37,7 +56,6 @@ const start = async () => {
       logger.info(`Servidor escuchando en puerto ${PORT}`);
       console.log(`✅ Servidor listo en puerto ${PORT}`);
     });
-
   } catch (err) {
     logger.error('Error inicio app:', err.message);
     process.exit(1);
