@@ -8,13 +8,9 @@ const YEAR_FROM = 2018;
 const KM_TO = 60000;
 const COMBUSTIBLE = 'nafta';
 const TRANSMISION = 'MT';
-const RBR_ID = 107;  
-const MRK_ID = 1118;  
 
 const searchParams = new URLSearchParams({
   action: 'finder/search',
-  rbrId: RBR_ID,
-  mrkId: MRK_ID,
   itmModelDesc: MODELO,
   optKm: 'usados',
   'km[to]': KM_TO,
@@ -32,7 +28,7 @@ module.exports = {
   TELEGRAM_TOKEN: process.env.TELEGRAM_TOKEN,
   TELEGRAM_CHAT_ID: process.env.TELEGRAM_CHAT_ID,
   USER_AGENT: process.env.USER_AGENT,
-  CHECK_INTERVAL_CRON: process.env.CHECK_INTERVAL_CRON || '*/30 * * * *', // cada 30 min por default
+  CHECK_INTERVAL_CRON: process.env.CHECK_INTERVAL_CRON || '*/30 * * * *',
   ROSARIO_URL,
 
   // filtros separados por si los necesitas en otras partes del código
@@ -40,7 +36,5 @@ module.exports = {
   YEAR_FROM,
   KM_TO,
   COMBUSTIBLE,
-  TRANSMISION,
-  RBR_ID,
-  MRK_ID
+  TRANSMISION
 };
